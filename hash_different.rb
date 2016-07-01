@@ -9,7 +9,7 @@ class Hash
   def diff_h(arg,com_hash)
     # arg :１ or ２
     # 1 => return array which contains key belongs to only com_hash
-    # 2 => return hash which contains key belongs to bith Hash
+    # 2 => return hash which contains key belongs to both Hash
     @@diff = []
     @@dif = {}
     if arg == 1
