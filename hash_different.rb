@@ -1,5 +1,5 @@
 class String
-  # 文字列に対して数値を示すものか調べる
+  # search the str means num?
   def number?
     self =~ /\A-?\d+(.\d+)?\Z/
   end
@@ -7,9 +7,9 @@ end
 
 class Hash
   def diff_h(arg,com_hash)
-    # arg は１、２
-    # 1 => com_hash にあって元にないものを配列で返す
-    # 2 => com_hash と元の共通部分の差をハッシュで返す
+    # arg :１ or ２
+    # 1 => return array which contains key belongs to only com_hash
+    # 2 => return hash which contains key belongs to bith Hash
     @@diff = []
     @@dif = {}
     if arg == 1
