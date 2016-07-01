@@ -1,62 +1,77 @@
 ###############################################################################
-##############　　クライアント側プログラム server.rb と使用　　　####################
+##############　　クライアント側プログラム client.rb と使用　　　####################
 ################################################################################
 
 require 'socket'
 
-# host , PORT_NUMBER を定義
-HOST = "localhost"
-PORT_FOR_LOGIN = 12345
-# localhost のポート番号 12345 に接続
-sock = TCPSocket.open(HOST,PORT_FOR_LOGIN)
+class LoginCertifyError < StandardError; end
+class LoginUserKnownError < StandardError; end
+# HashVariable user for login
+# key:username , value:password
+$user = {"testuser"=>"test"}
+port_number = 12345
+port_num = 23456
 
-# ログイン
-loop do
-  print "ユーザ名　パスワード (新規登録はsign_upを入力): "
-  input = STDIN.gets.chomp
-  if input == "sign_up"
-    loop do
-      sock.puts input # サーバー側を新規登録に変更
-      print "ユーザ名を入力してください："
-      new_user = STDIN.gets.chomp
-      sock.puts new_user # ユーザ名をサーバーに送信
-      printf "パスワードを入力してください："
-      new_user_pass = STDIN.gets.chomp
-      sock.puts new_user_pass # パスワードをサーバーに送信
-      result = sock.gets.chomp
-      puts "新規ユーザ #{new_user} を登録しました。"
-      break if result == "suc" # suc が返ってきたら新規登録成功
-    end
+def login(username,password)
+  raise LoginCertifyError unless $user[username] == password
+  raise LoginUserUnknownError unless $user[username]
+  return true
+end
+
+# open the port
+con = TCPServer.open(port_number)
+puts "waiting connect・・・"
+# receive connect
+receive = con.accept
+
+while data = receive.gets.chomp
+  if data == "sign_up"
+    name = receive.gets.chomp
+    pass = receive.gets.chomp
+    $user[name] = pass
+    puts "sign_up name:#{name}  password:#{pass}"
+    receive.puts "suc"
+    next
   else
-    # サーバーに入力文字列を渡す
-    sock.puts input
-    # サーバーからの返事を取得
-    reply = sock.gets.chomp
-    puts reply
-    if reply == "success"
-      break
+    arr = data.split(" ")
+    if arr.size > 2 || arr.size <= 1
+      puts "Incorrect input"
+      server.puts "Incorrect input"
+    else
+      begin
+        login(arr[0].to_s,arr[1].to_s)
+        puts "login success"
+        receive.puts "success"
+        break
+      rescue LoginCertifyError => ce
+        puts ce
+        receive.puts "Incorrect password"
+      rescue LoginUserUnKnownError => um
+        puts um
+        server.puts "not find user"
+      end
     end
   end
 end
-# PORT_FOR_LOGIN のポートを閉じる
-sock.close
-sleep(0.7)
-puts "新しいポートを開きます"
-# 定数 PORT_NUMBER を定義
-PORT_NUMBER = 23456
-# localhost(自マシン)のポート番号 23456 をオープン
-sk = TCPSocket.open(HOST,PORT_NUMBER)
 
+# close receive
+receive.close
+puts "close port and change"
+re = TCPServer.open(port_num)
+n = re.accept
 
-# 入力
-loop do
-  print "送るメッセージ："
-  line = STDIN.gets.chomp
-  # ソケットに入力文字列を渡す
-  sk.puts line
-  break if line == "quit" # 終了処理
-  sk.flush
+while data = n.gets.chomp
+  if data == "exit"
+    break
+  end
+  `say #{data}`
+  length = data.size
+  0.upto(length-1) do |i|
+    STDERR.print "\r" + " "*(length-1-i) + data[0..i] + " "
+    sleep(0.05)
+  end
+  print "\n"
 end
 
-# 接続を閉じる
-sk.close
+# close
+n.close

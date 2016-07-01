@@ -4,59 +4,60 @@
 
 require 'socket'
 
-# host , PORT_NUMBER を定義
 HOST = "localhost"
 PORT_FOR_LOGIN = 12345
-# localhost のポート番号 12345 に接続
+PORT_NUMBER = 23456
+
+# connect
 sock = TCPSocket.open(HOST,PORT_FOR_LOGIN)
 
-# ログイン
+# login => Enter username and password separated by a space
 loop do
-  print "ユーザ名　パスワード (新規登録はsign_upを入力): "
+  print "username　password (Enter : sign_up): "
   input = STDIN.gets.chomp
   if input == "sign_up"
     loop do
-      sock.puts input # サーバー側を新規登録に変更
-      print "ユーザ名を入力してください："
+      sock.puts input # send the sing_up symbol to server program
+      print "username："
       new_user = STDIN.gets.chomp
-      sock.puts new_user # ユーザ名をサーバーに送信
-      printf "パスワードを入力してください："
+      sock.puts new_user # send the username to server program
+      printf "password："
       new_user_pass = STDIN.gets.chomp
-      sock.puts new_user_pass # パスワードをサーバーに送信
+      sock.puts new_user_pass # send the password to program
       result = sock.gets.chomp
-      puts "新規ユーザ #{new_user} を登録しました。"
-      break if result == "suc" # suc が返ってきたら新規登録成功
+      puts "success sing_up as #{new_user}"
+      break if result == "suc"
     end
   else
-    # サーバーに入力文字列を渡す
+    # send input to server program
     sock.puts input
-    # サーバーからの返事を取得
+    # receive reply
     reply = sock.gets.chomp
     puts reply
     if reply == "success"
       break
+    else
+      next
     end
   end
 end
-# PORT_FOR_LOGIN のポートを閉じる
+
+# close PORT_FOR_LOGIN
 sock.close
 sleep(0.7)
-puts "新しいポートを開きます"
-# 定数 PORT_NUMBER を定義
-PORT_NUMBER = 23456
-# localhost(自マシン)のポート番号 23456 をオープン
+puts "open new port"
+# connect port
 sk = TCPSocket.open(HOST,PORT_NUMBER)
 
-
-# 入力
+# input
 loop do
-  print "送るメッセージ："
+  print "message?(to quit enter exit)： "
   line = STDIN.gets.chomp
-  # ソケットに入力文字列を渡す
+  # send input
   sk.puts line
-  break if line == "quit" # 終了処理
+  break if line == "exit"
   sk.flush
 end
 
-# 接続を閉じる
+# close
 sk.close
