@@ -8,5 +8,6 @@ comment out the \'say ~~\' line.
 ・hash_different.rb<br />
 => This code enables you check the difference of two hashes.<br />
 `hash1.diff(1,hash2)` means returning array which contains key belongs to only hash2<br />
-`hash1.diff(2,hash2)` means returning hash which contains key belongs to both hash1 and hash2
+`hash1.diff(2,hash2)` means returning hash which contains key belongs to both hash1 and hash2<br />
+Be carefull, this code returns array or hash ,so `puts` or `p` method is needed.
 
