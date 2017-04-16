@@ -13,7 +13,7 @@ sock = TCPSocket.open(HOST,PORT_FOR_LOGIN)
 
 # login => Enter username and password separated by a space
 loop do
-  print "username　password (Enter : sign_up): "
+  print "username　password (sign_up): "
   input = STDIN.gets.chomp
   if input == "sign_up"
     loop do
